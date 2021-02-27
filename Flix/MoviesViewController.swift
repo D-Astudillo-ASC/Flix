@@ -19,7 +19,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        print("hello")
         
         tableView.dataSource = self
         tableView.delegate = self 
@@ -34,11 +33,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
               let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
               self.movies = dataDictionary["results"] as! [[String: Any]]
             
-            //print(dataDictionary)
-                
-              // TODO: Get the array of movies
-              // TODO: Store the movies in a property to use elsewhere
-              // TODO: Reload your table view data
             self.tableView.reloadData()
            }
         }
@@ -56,16 +50,32 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         let movie = movies[indexPath.row]
         let title = movie["title"] as! String
         let synopsis = movie["overview"] as! String
-        print("row: \(indexPath.row)")
         cell.titleLabel.text = title
         cell.synopsisLabel.text = synopsis
-        //cell.titleLabel.text = "row: \(indexPath.row)"
-//        cell.textLabel!.text = "row: \(indexPath.row)"
         let baseUrl = "https://image.tmdb.org/t/p/w185"
         let posterPath = movie["poster_path"] as! String
         let posterUrl = URL(string:baseUrl + posterPath)
         cell.posterView.af.setImage(withURL: posterUrl!)
         return cell
+    }
+    
+    //In a storyboard-based app, you'll want to do some preparation before navigation takes place.
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        //Get new view controller using segue.destination
+        //Pass selected object to new  view controller
+        
+        //Find selected movie cell.
+        let cell = sender as! UITableViewCell
+        let indexPath = tableView.indexPath(for: cell)!
+        let movie = movies[indexPath.row]
+    
+        //Pass selected movie to details view controller.
+        //need to cast as MovieDetailsViewController, otherwise segue.destination will return a generic view controller not our custom one.
+        let detailsViewController = segue.destination as! MovieDetailsViewController
+        detailsViewController.movie = movie
+        
+        //twitter does this actually.
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 
 
